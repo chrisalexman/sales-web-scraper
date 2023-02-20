@@ -7,6 +7,13 @@ import requests
 import json
 
 
+# dictionary of the items at full price
+full_price = {
+    'TOMS Carlo Sneaker'           : 54.95,
+    'MoonGoat Pocket Shop T-Shirt' : 22.27
+}
+
+
 # get data for TOMS shoe
 def get_toms_data():
 
@@ -51,7 +58,7 @@ def get_moongoat_data():
 
     # fix formatting of data
     name = ''.join(char.upper() if (index == 0 or index == 4) else char for index, char in enumerate(name))
-    price = price[:2]git a + '.' + price[2:]
+    price = price[:2] + '.' + price[2:]
 
     return name, price, size
 
