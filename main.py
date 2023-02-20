@@ -7,6 +7,7 @@ import requests
 import json
 
 
+# get data for TOMS shoe
 def get_toms_data():
 
     link = 'https://www.toms.com/us/men/shoes/sneakers/' \
@@ -16,13 +17,11 @@ def get_toms_data():
     soup = BeautifulSoup(page.content, 'html.parser')
 
     data_product = soup.find('div', {'data-product': True})['data-product']
-
     product_dict = json.loads(data_product)['product']
-
-    name = product_dict['brand_name'] + ' ' + product_dict['name']
 
     shoe = product_dict['variants'][0]
 
+    name = product_dict['brand_name'] + ' ' + product_dict['name']
     price = shoe['price']
     size = 10
     in_stock = shoe['in_stock']
@@ -31,13 +30,28 @@ def get_toms_data():
     return name, price, size
 
 
+# get data for MoonGoat shirt
 def get_moongoat_data():
 
     link = 'https://moongoat.com/products/pocket-shop-t-shirt'
 
-    name = 'name'
-    price = 'price'
-    size = 'size'
+    page = requests.get(link)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    product_data = soup.find('script', id='wcp_json_7807686967547')
+    product_dict = json.loads(product_data.text)
+
+    shirt = product_dict['variants'][1]
+
+    name = product_dict['vendor'] + ' ' + product_dict['title']
+    price = str(shirt['price'])
+    size = shirt['title']
+    in_stock = shirt['available']
+    image_link = product_dict['featured_image']
+
+    # fix formatting of data
+    name = ''.join(char.upper() if (index == 0 or index == 4) else char for index, char in enumerate(name))
+    price = price[:2]git a + '.' + price[2:]
 
     return name, price, size
 
