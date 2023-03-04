@@ -6,9 +6,19 @@ from bs4 import BeautifulSoup
 import requests
 import json
 
+import os.path
+import base64
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from email.message import EmailMessage
+
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # dictionary of the items at full price
-full_price = {
+full_prices = {
     'TOMS Carlo Sneaker'           : 54.95,
     'MoonGoat Pocket Shop T-Shirt' : 22.27
 }
@@ -29,7 +39,7 @@ def get_toms_data():
     shoe = product_dict['variants'][0]
 
     name = product_dict['brand_name'] + ' ' + product_dict['name']
-    price = shoe['price']
+    price = float(shoe['price'])
     size = 10
     in_stock = shoe['in_stock']
     image_link = shoe['image_url']
@@ -58,22 +68,33 @@ def get_moongoat_data():
 
     # fix formatting of data
     name = ''.join(char.upper() if (index == 0 or index == 4) else char for index, char in enumerate(name))
-    price = price[:2] + '.' + price[2:]
+    price = float(price[:2] + '.' + price[2:])
 
     return name, price, size
 
 
-items = [get_toms_data, get_moongoat_data]
+# scrape HTML from web pages, get basic data, send email if sale found
+def get_website_data():
 
-# scrape HTML from web pages, get price data and more
-def get_website_info():
+    items = [get_toms_data, get_moongoat_data]
+    on_sale = []
 
     for item in items:
 
         name, price, size = item()
+        full_price = full_prices[name]
 
-        print(f'{name} : ${price} : size {size}')
+        if(price < full_price):
+            on_sale.append([name, full_price, price, size])
+
+    if on_sale:
+        send_sale_email(on_sale)
+
+
+# send an email to myself with the sale data
+def send_sale_email(sales):
+    print(f'list of sales: {sales}')
 
 
 if __name__ == '__main__':
-    get_website_info()
+    get_website_data()
