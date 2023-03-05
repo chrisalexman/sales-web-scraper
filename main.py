@@ -46,7 +46,7 @@ def get_toms_data():
     in_stock = shoe['in_stock']
     image_link = shoe['image_url']
 
-    return name, price, size
+    return name, price, size, link
 
 
 # get data for MoonGoat shirt
@@ -72,7 +72,7 @@ def get_moongoat_data():
     name = ''.join(char.upper() if (index == 0 or index == 4) else char for index, char in enumerate(name))
     price = float(price[:2] + '.' + price[2:])
 
-    return name, price, size
+    return name, price, size, link
 
 
 # scrape HTML from web pages, get basic data, send email if sale found
@@ -83,11 +83,11 @@ def get_website_data():
 
     for item in items:
 
-        name, price, size = item()
+        name, price, size, link = item()
         full_price = full_prices[name]
 
         if(price < full_price):
-            data = (name, price, full_price, size)
+            data = (name, price, size, link)
             on_sale.append(data)
 
     if on_sale:
@@ -117,13 +117,13 @@ def send_sale_email(sales):
         service = build('gmail', 'v1', credentials=creds)
         message = EmailMessage()
 
-        email_body = 'beep boop found a sale:\n'
+        email_body = 'sales bot found a sale\n'
 
         for sale in sales:
 
-            name, price, full_price, size = sale
+            name, price, size, link = sale
 
-            sale_str = f'\n| {name} | is on sale for ${price} from {full_price} | in size {size} |'
+            sale_str = f'\n| {name} |\n  on sale ${price}, size {size}\n{link}\n'
 
             email_body = ''.join((email_body, sale_str))
 
