@@ -15,6 +15,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from email.message import EmailMessage
 
+import email_info
+
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # dictionary of the items at full price
@@ -85,15 +87,64 @@ def get_website_data():
         full_price = full_prices[name]
 
         if(price < full_price):
-            on_sale.append([name, full_price, price, size])
+            data = (name, price, full_price, size)
+            on_sale.append(data)
 
     if on_sale:
         send_sale_email(on_sale)
 
 
-# send an email to myself with the sale data
+# send an email to myself with the data of the item(s) on sale
 def send_sale_email(sales):
-    print(f'list of sales: {sales}')
+
+    creds = None
+
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+
+    try:
+        service = build('gmail', 'v1', credentials=creds)
+        message = EmailMessage()
+
+        email_body = 'beep boop found a sale:\n'
+
+        for sale in sales:
+
+            name, price, full_price, size = sale
+
+            sale_str = f'\n| {name} | is on sale for ${price} from {full_price} | in size {size} |'
+
+            email_body = ''.join((email_body, sale_str))
+
+        message.set_content(email_body)
+  
+        message['To'] = email_info.get_email()
+        message['From'] = email_info.get_email()
+        message['Subject'] = 'You\'ve got sale'
+  
+        encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
+  
+        create_message = {
+            'raw': encoded_message
+        }
+
+        send_message = (service.users().messages().send(userId="me", body=create_message).execute())
+        print(f'Message Id: {send_message["id"]}')
+
+    except HttpError as error:
+        send_message = None
+        print(f'An error occurred: {error}')
 
 
 if __name__ == '__main__':
