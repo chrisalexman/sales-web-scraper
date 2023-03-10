@@ -58,7 +58,7 @@ def get_moongoat_data():
     soup = BeautifulSoup(page.content, 'html.parser')
 
     product_data = soup.find('script', id='wcp_json_7807686967547')
-    product_dict = json.loads(product_data.text)
+    product_dict = json.loads(product_data.string)
 
     shirt = product_dict['variants'][1]
 
