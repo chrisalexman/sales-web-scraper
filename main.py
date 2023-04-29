@@ -131,7 +131,7 @@ def send_sale_email(sales):
   
         message['To'] = email_info.get_email()
         message['From'] = email_info.get_email()
-        message['Subject'] = 'You\'ve got sale'
+        message['Subject'] = 'you\'ve got sale'
   
         encoded_message = base64.urlsafe_b64encode(message.as_bytes()).decode()
   
