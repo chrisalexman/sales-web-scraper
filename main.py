@@ -21,8 +21,9 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # dictionary of the items at full price
 full_prices = {
-    'TOMS Carlo Sneaker'           : 54.95,
-    'MoonGoat Pocket Shop T-Shirt' : 22.27
+    'TOMS Carlo Sneaker'                         : 54.95,
+    'MoonGoat Pocket Shop T-Shirt'               : 22.27,
+    'Sony WH-1000XM4 Noise Canceling Headphones' : 349.99
 }
 
 
@@ -75,10 +76,30 @@ def get_moongoat_data():
     return name, price, size, link
 
 
+# get data for Sony WH-1000XM4 Noise Canceling Headphones
+def get_headphone_data():
+
+    link = 'https://electronics.sony.com/audio/headphones/headband/p/wh1000xm4-b'
+
+    page = requests.get(link)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    product_data = soup.find('script', id='pdp-jsonld-data')
+    product_dict = json.loads(product_data.string)
+
+    name = ' '.join([product_dict['brand']['name'], product_dict['description'][3:13], product_dict['description'][31:57]])
+    price = product_dict['offers']['price']
+    size = 'N/A'
+    in_stock = 'Y'
+    image_link = product_dict['image']
+
+    return name, price, size, link
+
+
 # scrape HTML from web pages, get basic data, send email if sale found
 def get_website_data():
 
-    items = [get_toms_data, get_moongoat_data]
+    items = [get_toms_data, get_moongoat_data, get_headphone_data]
     on_sale = []
 
     for item in items:
