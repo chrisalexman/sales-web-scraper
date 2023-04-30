@@ -23,7 +23,8 @@ SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 full_prices = {
     'TOMS Carlo Sneaker'                         : 54.95,
     'MoonGoat Pocket Shop T-Shirt'               : 22.27,
-    'Sony WH-1000XM4 Noise Canceling Headphones' : 349.99
+    'Sony WH-1000XM4 Noise Canceling Headphones' : 349.99,
+    'Hades No Escape Shirt'                      : 32.00
 }
 
 
@@ -96,10 +97,30 @@ def get_headphone_data():
     return name, price, size, link
 
 
+# get data for Hades Shirt
+def get_hades_data():
+
+    link = 'https://www.fangamer.com/collections/hades/products/hades-shirt-no-escape'
+
+    page = requests.get(link)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    product_data = soup.find('section', id='pricing_and_sizes')
+    price_size_data = soup.find('option', value='40367665610809').text
+
+    name = 'Hades No Escape Shirt'
+    price = float(price_size_data[-5:])
+    size = price_size_data[7:8]
+    in_stock = 'Y'
+    image_link = 'N/A'
+
+    return name, price, size, link
+
+
 # scrape HTML from web pages, get basic data, send email if sale found
 def get_website_data():
 
-    items = [get_toms_data, get_moongoat_data, get_headphone_data]
+    items = [get_toms_data, get_moongoat_data, get_headphone_data, get_hades_data]
     on_sale = []
 
     for item in items:
