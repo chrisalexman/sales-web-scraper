@@ -29,6 +29,16 @@ full_prices = {
 }
 
 
+# configure the logging to output
+def config_logging():
+
+    logging.basicConfig(filename='output.log', filemode='a', level=logging.INFO, 
+                        format='%(asctime)s %(levelname)s %(message)s')
+    
+    # to avoid - INFO file_cache is only supported with oauth2client<4.0.0
+    logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
+
+
 # get data for TOMS shoe
 def get_toms_data():
 
@@ -135,6 +145,8 @@ def get_website_data():
 
     if on_sale:
         send_sale_email(on_sale)
+    else:
+        logging.info('no sales found, no email sent')
 
 
 # send an email to myself with the data of the item(s) on sale
@@ -144,6 +156,9 @@ def send_sale_email(sales):
 
     if os.path.exists('token.json'):
         creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+
+        # refresh the credentials
+        creds.refresh(Request())
 
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -170,6 +185,8 @@ def send_sale_email(sales):
 
             email_body = ''.join((email_body, sale_str))
 
+            logging.info(f'item on sale - {name} (${price})')
+
         message.set_content(email_body)
   
         message['To'] = email_info.get_email()
@@ -183,12 +200,13 @@ def send_sale_email(sales):
         }
 
         send_message = (service.users().messages().send(userId="me", body=create_message).execute())
-        print(f'Message Id: {send_message["id"]}')
+        logging.info(f'sent email, id {send_message["id"]}')
 
     except HttpError as error:
         send_message = None
-        print(f'An error occurred: {error}')
+        logging.error(f'An error occurred: {error}')
 
 
 if __name__ == '__main__':
+    config_logging()
     get_website_data()
