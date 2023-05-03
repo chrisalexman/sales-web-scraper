@@ -25,7 +25,8 @@ full_prices = {
     'TOMS Carlo Sneaker'                         : 54.95,
     'MoonGoat Pocket Shop T-Shirt'               : 22.27,
     'Sony WH-1000XM4 Noise Canceling Headphones' : 349.99,
-    'Hades No Escape Shirt'                      : 32.00
+    'Hades No Escape Shirt'                      : 32.00,
+    'Battlecry Acre Crusader Broadsword'         : 329.95
 }
 
 
@@ -128,10 +129,36 @@ def get_hades_data():
     return name, price, size, link
 
 
+# get data for the battlecry acre crusader broadsword
+def get_broadsword_data():
+
+    link = 'https://www.museumreplicas.com/acre-crusader-broadsword'
+
+    page = requests.get(link)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    name_data = soup.find('meta', property='og:title')['content']
+    
+    price_data = soup.select_one('span[class*=price]').text
+    price_data = price_data[2:8]
+
+    stock_data = soup.select_one('span[id=stock-availability-value-2878]').text
+
+    image_data = soup.find_all('a', {'class' : 'cloud-zoom-gallery thumb-item'})[-1]['href']
+
+    name = name_data
+    price = float(price_data)
+    size = '39-1/4"'
+    in_stock = stock_data
+    image_link = image_data
+
+    return name, price, size, link
+
+
 # scrape HTML from web pages, get basic data, send email if sale found
 def get_website_data():
 
-    items = [get_toms_data, get_moongoat_data, get_headphone_data, get_hades_data]
+    items = [get_toms_data, get_moongoat_data, get_headphone_data, get_hades_data, get_broadsword_data]
     on_sale = []
 
     for item in items:
