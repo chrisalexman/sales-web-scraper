@@ -49,16 +49,18 @@ def get_toms_data():
     page = requests.get(link)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    data_product = soup.find('div', {'data-product': True})['data-product']
-    product_dict = json.loads(data_product)['product']
+    product_data = soup.find('div', {'data-product': True})['data-product']
+    product_dict = json.loads(product_data)['product']
 
-    shoe = product_dict['variants'][0]
+    size_data = soup.find('button', {'aria-label' : 'Select Men Size 10'})['data-size']
 
-    name = product_dict['brand_name'] + ' ' + product_dict['name']
-    price = float(shoe['price'])
-    size = 10
-    in_stock = shoe['in_stock']
-    image_link = shoe['image_url']
+    shoe_variant = product_dict['variants'][0]
+
+    name = ' '.join([product_dict['brand_name'], product_dict['name']])
+    price = float(shoe_variant['price'])
+    size = size_data
+    in_stock = shoe_variant['in_stock']
+    image_link = shoe_variant['image_url']
 
     return name, price, size, link
 
