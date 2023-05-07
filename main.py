@@ -76,12 +76,12 @@ def get_moongoat_data():
     product_data = soup.find('script', id='wcp_json_7807686967547')
     product_dict = json.loads(product_data.string)
 
-    shirt = product_dict['variants'][1]
+    shirt_variant = product_dict['variants'][1]
 
-    name = product_dict['vendor'] + ' ' + product_dict['title']
-    price = str(shirt['price'])
-    size = shirt['title']
-    in_stock = shirt['available']
+    name = ' '.join([product_dict['vendor'], product_dict['title']])
+    price = str(shirt_variant['price'])
+    size = shirt_variant['title']
+    in_stock = shirt_variant['available']
     image_link = product_dict['featured_image']
 
     # fix formatting of data
