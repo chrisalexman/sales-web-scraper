@@ -26,7 +26,8 @@ full_prices = {
     'MoonGoat Pocket Shop T-Shirt'               : 22.27,
     'Sony WH-1000XM4 Noise Canceling Headphones' : 349.99,
     'Hades No Escape Shirt'                      : 32.00,
-    'Battlecry Acre Crusader Broadsword'         : 329.95
+    'Battlecry Acre Crusader Broadsword'         : 329.95,
+    'CROM Dark Splendor T-shirt'                 : 31.00
 }
 
 
@@ -162,10 +163,34 @@ def get_broadsword_data():
     return name, price, size, link
 
 
+# get data for the crom dark splendor t-shirt
+def get_crom_data():
+
+    link = 'https://crom.ink/shop/dark-splendor-t-shirt'
+
+    page = requests.get(link)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    name_data = soup.find('title').text
+
+    product_data = soup.find('div', {'class' : 'product-variants'})
+
+    variant = json.loads(product_data['data-variants'])[0]
+
+    name = ' '.join([name_data[24:28], name_data[0:21]])
+    price = float(variant['salePriceMoney']['value'])
+    size = variant['attributes']['Size']
+    in_stock = int(variant['qtyInStock']) > 0
+    image_link = variant['mainImage']['assetUrl']
+    
+    return name, price, size, link
+
+
 # scrape HTML from web pages, get basic data, send email if sale found
 def get_website_data():
 
-    items = [get_toms_data, get_moongoat_data, get_headphone_data, get_hades_data, get_broadsword_data]
+    items = [get_toms_data, get_moongoat_data, get_headphone_data, get_hades_data, get_broadsword_data, 
+             get_crom_data]
     on_sale = []
 
     for item in items:
