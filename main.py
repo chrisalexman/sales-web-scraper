@@ -102,10 +102,12 @@ def get_headphone_data():
     product_data = soup.find('script', id='pdp-jsonld-data')
     product_dict = json.loads(product_data.string)
 
+    stock_data = soup.find('button', {'class' : 'sony-btn sony-btn--primary sony-btn--primary w-100'}).text[1:12]
+
     name = ' '.join([product_dict['brand']['name'], product_dict['description'][3:13], product_dict['description'][31:57]])
     price = product_dict['offers']['price']
     size = 'N/A'
-    in_stock = 'Y'
+    in_stock = stock_data == 'Add to cart'
     image_link = product_dict['image']
 
     return name, price, size, link
