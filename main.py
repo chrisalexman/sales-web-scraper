@@ -27,7 +27,8 @@ full_prices = {
     'Sony WH-1000XM4 Noise Canceling Headphones' : 349.99,
     'Hades No Escape Shirt'                      : 32.00,
     'Battlecry Acre Crusader Broadsword'         : 329.95,
-    'CROM Dark Splendor T-shirt'                 : 31.00
+    'CROM Dark Splendor T-shirt'                 : 31.00,
+    'LG 34WQ75C-B Monitor'                       : 599.99
 }
 
 
@@ -182,6 +183,31 @@ def get_crom_data():
     size = variant['attributes']['Size']
     in_stock = int(variant['qtyInStock']) > 0
     image_link = variant['mainImage']['assetUrl']
+
+    return name, price, size, link
+
+
+# get data for the LG 34WQ75C-B Monitor
+def get_monitor_data():
+
+    link = 'https://www.lg.com/us/monitors/lg-34wq75c-b'
+
+    page = requests.get(link)
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    name_data = soup.find('meta', {'property' : 'og:description'})
+
+    price_data = soup.find('meta', {'itemprop' : 'price'})
+
+    stock_data = soup.find('div', {'class' : 'in-stock-pdp-new'})\
+    
+    image_data = soup.find('img', {'class' : 'pc'})
+
+    name = ' '.join([name_data['content'][5:17], 'Monitor'])
+    price = float(price_data['content'])
+    size = 'N/A'
+    in_stock = stock_data.text[0:9]
+    image_link = image_data['src']
     
     return name, price, size, link
 
@@ -190,7 +216,7 @@ def get_crom_data():
 def get_website_data():
 
     items = [get_toms_data, get_moongoat_data, get_headphone_data, get_hades_data, get_broadsword_data, 
-             get_crom_data]
+             get_crom_data, get_monitor_data]
     on_sale = []
 
     for item in items:
