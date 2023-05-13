@@ -121,13 +121,16 @@ def get_hades_data():
     page = requests.get(link)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    product_data = soup.find('section', id='pricing_and_sizes')
     price_size_data = soup.find('option', value='40367665610809').text
 
+    stock_data = soup.find('meta', content='InStock')
+
+    image_data = ''.join(['https:', soup.find_all('a', {'class' : 'item'})[1]['href']])
+    
     name = 'Hades No Escape Shirt'
     price = float(price_size_data[-5:])
     size = price_size_data[7:8]
-    in_stock = 'Y'
+    in_stock = stock_data['content']
     image_link = 'N/A'
 
     return name, price, size, link
