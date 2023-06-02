@@ -56,7 +56,7 @@ def get_toms_data():
 
     size_data = soup.find('button', {'aria-label' : 'Select Men Size 10'})
 
-    if size is None:
+    if size_data is None:
         size_data = 'N/A'
     else:
         size_data = size_data['data-size']
@@ -156,8 +156,7 @@ def get_broadsword_data():
 
     name_data = soup.find('meta', property='og:title')['content']
     
-    price_data = soup.select_one('span[class*=price]').text
-    price_data = price_data[2:8]
+    price_data = soup.find('span', {'class' : 'price-value-2878 sezzle-price'})['content']
 
     stock_data = soup.select_one('span[id=stock-availability-value-2878]').text
 
