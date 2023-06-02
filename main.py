@@ -54,7 +54,12 @@ def get_toms_data():
     product_data = soup.find('div', {'data-product': True})['data-product']
     product_dict = json.loads(product_data)['product']
 
-    size_data = soup.find('button', {'aria-label' : 'Select Men Size 10'})['data-size']
+    size = soup.find('button', {'aria-label' : 'Select Men Size 10'})
+
+    if size is None:
+        size_data = 'N/A'
+    else:
+        size_data = soup.find('button', {'aria-label' : 'Select Men Size 10'})['data-size']
 
     shoe_variant = product_dict['variants'][0]
 
