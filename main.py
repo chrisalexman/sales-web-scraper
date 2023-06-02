@@ -151,9 +151,6 @@ def get_broadsword_data():
     page = requests.get(link)
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    with open('output.txt', 'w') as f:
-        f.write(str(soup))
-
     name_data = soup.find('meta', property='og:title')['content']
     
     price_data = soup.find('span', {'class' : 'price-value-2878 sezzle-price'})['content']
