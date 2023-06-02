@@ -54,12 +54,12 @@ def get_toms_data():
     product_data = soup.find('div', {'data-product': True})['data-product']
     product_dict = json.loads(product_data)['product']
 
-    size = soup.find('button', {'aria-label' : 'Select Men Size 10'})
+    size_data = soup.find('button', {'aria-label' : 'Select Men Size 10'})
 
     if size is None:
         size_data = 'N/A'
     else:
-        size_data = soup.find('button', {'aria-label' : 'Select Men Size 10'})['data-size']
+        size_data = size_data['data-size']
 
     shoe_variant = product_dict['variants'][0]
 
@@ -150,6 +150,9 @@ def get_broadsword_data():
 
     page = requests.get(link)
     soup = BeautifulSoup(page.content, 'html.parser')
+
+    with open('output.txt', 'w') as f:
+        f.write(str(soup))
 
     name_data = soup.find('meta', property='og:title')['content']
     
